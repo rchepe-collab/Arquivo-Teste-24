@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Commander 5.0 - AMBIENTALLIS CONTROL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.8); }
+        }
+
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slide-in-right {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .float { animation: float 3s ease-in-out infinite; }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .slide-in { animation: slide-in 0.5s ease-out forwards; }
+        .slide-in-right { animation: slide-in-right 0.3s ease-out forwards; }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #c084fc, #f9a8d4, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(192, 132, 252, 0.5);
+        }
+
+        .subtitle {
+            color: rgba(192, 132, 252, 0.7);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.points { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+        .stat-icon.streak { background: linear-gradient(135deg, #f43f5e, #ec4899); }
+        .stat-icon.target { background: linear-gradient(135deg, #10b981, #14b8a6); }
+        .stat-icon.trend { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            color: rgba(192, 132, 252, 0.6);
+            font-size: 0.875rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 0.875rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: rgba(192, 132, 252, 0.7);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-button:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+            color: #fff;
+            border-bottom: 3px solid #a855f7;
+        }
+
+        /* Controls */
+        .controls {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #c084fc;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #c084fc;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            color: #fff;
+        }
+
+        .date-filter {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+
+        .date-filter::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .add-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+
+        /* Monthly Timeline */
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .month-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .month-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .month-header:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+        }
+
+        .month-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .month-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .month-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .month-badge.total {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .month-badge.completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .expand-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            color: #a855f7;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .month-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.3s ease;
+        }
+
+        .month-content.expanded {
+            max-height: 5000px;
+            padding: 1rem;
+        }
+
+        /* Calendar */
+        .calendar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            color: #c084fc;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day.has-tasks {
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .calendar-day.weekend {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .calendar-day-number {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .calendar-dots {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .calendar-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .task-count-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: #fff;
+            font-size: 0.625rem;
+            padding: 2px 6px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Task Cards */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 5px solid;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 16px rgba(168, 85, 247, 0.2);
+        }
+
+        .task-card.critica {
+            border-left-color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .task-card.urgente {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .task-card.normal {
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .task-card.sem-data {
+            border-left-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            color: #fff;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 0.75rem;
+            color: rgba(192, 132, 252, 0.7);
+            font-size: 0.875rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .badge.pendente { 
+            background: rgba(245, 158, 11, 0.2); 
+            color: #fbbf24; 
+            border-color: rgba(245, 158, 11, 0.3); 
+        }
+        
+        .badge.em_andamento { 
+            background: rgba(59, 130, 246, 0.2); 
+            color: #60a5fa; 
+            border-color: rgba(59, 130, 246, 0.3); 
+        }
+        
+        .badge.concluida { 
+            background: rgba(16, 185, 129, 0.2); 
+            color: #34d399; 
+            border-color: rgba(16, 185, 129, 0.3); 
+        }
+        
+        .badge.atrasada { 
+            background: rgba(244, 63, 94, 0.2); 
+            color: #fb7185; 
+            border-color: rgba(244, 63, 94, 0.3); 
+        }
+
+        .badge.sem_data {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .criticality-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            border: 1px solid;
+        }
+
+        .criticality-badge.critica {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff;
+            border-color: #dc2626;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
+
+        .criticality-badge.urgente {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #fff;
+            border-color: #f59e0b;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .criticality-badge.normal {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: #fff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-actions select,
+        .task-actions button,
+        .task-actions input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .task-actions select:hover,
+        .task-actions button:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+            transform: translateY(-2px);
+        }
+
+        .task-actions input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .delete-btn {
+            background: rgba(244, 63, 94, 0.2) !important;
+            color: #fb7185 !important;
+            border-color: rgba(244, 63, 94, 0.3) !important;
+        }
+
+        .delete-btn:hover {
+            background: rgba(244, 63, 94, 0.3) !important;
+            border-color: #f43f5e !important;
+        }
+
+        .define-date-btn {
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: #34d399 !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+
+        .define-date-btn:hover {
+            background: rgba(16, 185, 129, 0.3) !important;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 20, 60, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            animation: slide-in 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .day-modal-content {
+            background: rgba(30, 20, 60, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            animation: slide-in-right 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.75rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #c084fc;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group:hover {
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: #a855f7;
+        }
+
+        .recurrence-options {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(168, 85, 247, 0.05);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .recurrence-options.show {
+            display: block;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #c084fc;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            color: #fff;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .criticality-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .criticality-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .empty-state {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: rgba(168, 85, 247, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .day-task-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .day-task-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-section {
+                width: 100%;
+            }
+
+            .task-header {
+                flex-direction: column;
+            }
+
+            .month-stats {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .recurring-badge {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        select option {
+            background: #1e1b4b;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header slide-in">
+            <div style="margin-bottom: 1rem;">
+                <h1 class="main-title font-orbitron">AMBIENTALLIS CONTROL</h1>
+                <p class="subtitle">🎯 Timeline com Filtros • Ações a Definir • Sistema Completo</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon points">⭐</div>
+                    <div>
+                        <div class="stat-label">Pontos</div>
+                        <div class="stat-value" id="totalPoints">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon streak">🔥</div>
+                    <div>
+                        <div class="stat-label">Sequência</div>
+                        <div class="stat-value"><span id="streak">0</span> dias</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon target">🎯</div>
+                    <div>
+                        <div class="stat-label">Hoje</div>
+                        <div class="stat-value" id="completedToday">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon trend">📈</div>
+                    <div>
+                        <div class="stat-label">Taxa</div>
+                        <div class="stat-value"><span id="completionRate">0</span>%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('dashboard')" data-tab="dashboard">
+                    📊 Dashboard
+                </button>
+                <button class="tab-button" onclick="switchTab('timeline')" data-tab="timeline">
+                    📅 Timeline Mensal
+                </button>
+                <button class="tab-button" onclick="switchTab('acoes-definir')" data-tab="acoes-definir">
+                    📝 Ações a Definir
+                </button>
+                <button class="tab-button" onclick="switchTab('calendario')" data-tab="calendario">
+                    🗓️ Calendário
+                </button>
+                <button class="tab-button" onclick="switchTab('criticidade')" data-tab="criticidade">
+                    🎯 Por Criticidade
+                </button>
+                <button class="tab-button" onclick="switchTab('tarefas')" data-tab="tarefas">
+                    ✅ Todas as Tarefas
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div class="glass-card" style="padding: 1.5rem;">
+                    <h3 style="font-family: 'Orbitron', sans-serif; font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; color: #fff;">
+                        📊 Estatísticas Gerais
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: rgba(192, 132, 252, 0.7); font-weight: 500;">Total de Tarefas</span>
+                            <span class="font-orbitron" style="font-size: 1.5rem; font-weight: bold; color: #fff;" id="statTotal">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #34d399; font-weight: 500;">✓ Concluídas</span>
+                            <span class="font-orbitron" style="font-size: 1.25rem; font-weight: bold; color: #34d399;" id="statConcluidas">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #fbbf24; font-weight: 500;">◷ Pendentes</span>
+                            <span class="font-orbitron" style="font-size: 1.25rem; font-weight: bold; color: #fbbf24;" id="statPendentes">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #60a5fa; font-weight: 500;">◐ Em Andamento</span>
+                            <span class="font-orbitron" style="font-size: 1.25rem; font-weight: bold; color: #60a5fa;" id="statEmAndamento">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #fb7185; font-weight: 500;">✗ Atrasadas</span>
+                            <span class="font-orbitron" style="font-size: 1.25rem; font-weight: bold; color: #fb7185;" id="statAtrasadas">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(168, 85, 247, 0.2);">
+                            <span style="color: #c084fc; font-weight: 500;">📝 A Definir</span>
+                            <span class="font-orbitron" style="font-size: 1.25rem; font-weight: bold; color: #c084fc;" id="statSemData">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="padding: 1.5rem;">
+                    <h3 style="font-family: 'Orbitron', sans-serif; font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; color: #fff;">
+                        🎯 Por Criticidade
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 1rem; height: 1rem; border-radius: 50%; background: #dc2626;"></div>
+                                <span style="color: rgba(192, 132, 252, 0.7); font-weight: 500;">Críticas</span>
+                            </div>
+                            <span class="font-orbitron" style="font-size: 1.5rem; font-weight: bold; color: #ef4444;" id="statCriticas">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 1rem; height: 1rem; border-radius: 50%; background: #f59e0b;"></div>
+                                <span style="color: rgba(192, 132, 252, 0.7); font-weight: 500;">Urgentes</span>
+                            </div>
+                            <span class="font-orbitron" style="font-size: 1.5rem; font-weight: bold; color: #fbbf24;" id="statUrgentes">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 1rem; height: 1rem; border-radius: 50%; background: #3b82f6;"></div>
+                                <span style="color: rgba(192, 132, 252, 0.7); font-weight: 500;">Normais</span>
+                            </div>
+                            <span class="font-orbitron" style="font-size: 1.5rem; font-weight: bold; color: #60a5fa;" id="statNormais">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <button class="add-btn" onclick="openModal()" style="width: 100%; justify-content: center; padding: 1rem; font-size: 1.125rem;">
+                    ➕ Criar Primeira Tarefa
+                </button>
+            </div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div id="timeline" class="tab-content hidden">
+            <div class="controls">
+                <div class="filter-section">
+                    <span class="filter-label">Tipo de Atividade</span>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setTimelineTypeFilter('todas')" data-type-filter="todas">Todas</button>
+                        <button class="filter-btn" onclick="setTimelineTypeFilter('diaria')" data-type-filter="diaria">📅 Diárias</button>
+                        <button class="filter-btn" onclick="setTimelineTypeFilter('semanal')" data-type-filter="semanal">📆 Semanais</button>
+                        <button class="filter-btn" onclick="setTimelineTypeFilter('mensal')" data-type-filter="mensal">🗓️ Mensais</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="openModal()">
+                    ➕ Nova Tarefa
+                </button>
+            </div>
+            <div class="timeline-container" id="timelineContainer"></div>
+        </div>
+
+        <!-- Ações a Definir Tab -->
+        <div id="acoes-definir" class="tab-content hidden">
+            <div style="margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="add-btn" onclick="openModalSemData()">
+                    ➕ Nova Ação Sem Data
+                </button>
+                <p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; flex: 1; padding: 0.75rem;">
+                    💡 Estas são tarefas que você ainda não definiu quando fazer. Defina a data quando estiver pronto!
+                </p>
+            </div>
+            <div id="acoesSemDataList" class="tasks-list"></div>
+        </div>
+
+        <!-- Calendário Tab -->
+        <div id="calendario" class="tab-content hidden">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <h3 class="font-orbitron" style="font-size: 1.75rem; font-weight: bold; color: #fff;">🗓️ Calendário Interativo 2025-2026</h3>
+                    <select id="monthSelect" onchange="renderCalendar()" style="padding: 0.5rem 1rem; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: #fff; font-family: 'Inter', sans-serif; font-weight: 500;">
+                        <option value="11-2025">Dezembro 2025</option>
+                        <option value="0-2026">Janeiro 2026</option>
+                        <option value="1-2026">Fevereiro 2026</option>
+                        <option value="2-2026">Março 2026</option>
+                        <option value="3-2026">Abril 2026</option>
+                        <option value="4-2026">Maio 2026</option>
+                        <option value="5-2026">Junho 2026</option>
+                        <option value="6-2026">Julho 2026</option>
+                        <option value="7-2026">Agosto 2026</option>
+                        <option value="8-2026">Setembro 2026</option>
+                        <option value="9-2026">Outubro 2026</option>
+                        <option value="10-2026">Novembro 2026</option>
+                        <option value="11-2026">Dezembro 2026</option>
+                    </select>
+                </div>
+
+                <p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; margin-bottom: 1rem; font-weight: 500;">
+                    💡 <strong style="color: #c084fc;">Clique em um dia</strong> para ver todas as tarefas daquele dia
+                </p>
+
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Dom</div>
+                    <div class="calendar-day-header">Seg</div>
+                    <div class="calendar-day-header">Ter</div>
+                    <div class="calendar-day-header">Qua</div>
+                    <div class="calendar-day-header">Qui</div>
+                    <div class="calendar-day-header">Sex</div>
+                    <div class="calendar-day-header">Sáb</div>
+                </div>
+
+                <div class="calendar-grid" id="calendarDays"></div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #34d399;"></div>
+                        <span style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Concluída</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #60a5fa;"></div>
+                        <span style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Em Andamento</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #fbbf24;"></div>
+                        <span style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Pendente</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #fb7185;"></div>
+                        <span style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Atrasada</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criticidade Tab -->
+        <div id="criticidade" class="tab-content hidden">
+            <div style="margin-bottom: 1rem;">
+                <button class="add-btn" onclick="openModal()">
+                    ➕ Nova Tarefa
+                </button>
+            </div>
+
+            <!-- Críticas -->
+            <div class="criticality-section">
+                <div class="criticality-title" style="color: #ef4444;">
+                    <span style="font-size: 2rem;">🔴</span>
+                    CRÍTICAS
+                    <span class="month-badge" style="background: rgba(220, 38, 38, 0.2); color: #fb7185;" id="criticalCount">0</span>
+                </div>
+                <div id="criticalTasks" class="tasks-list"></div>
+            </div>
+
+            <!-- Urgentes -->
+            <div class="criticality-section">
+                <div class="criticality-title" style="color: #fbbf24;">
+                    <span style="font-size: 2rem;">🟠</span>
+                    URGENTES
+                    <span class="month-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;" id="urgentCount">0</span>
+                </div>
+                <div id="urgentTasks" class="tasks-list"></div>
+            </div>
+
+            <!-- Normais -->
+            <div class="criticality-section">
+                <div class="criticality-title" style="color: #60a5fa;">
+                    <span style="font-size: 2rem;">🔵</span>
+                    NORMAIS
+                    <span class="month-badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;" id="normalCount">0</span>
+                </div>
+                <div id="normalTasks" class="tasks-list"></div>
+            </div>
+        </div>
+
+        <!-- Todas as Tarefas Tab -->
+        <div id="tarefas" class="tab-content hidden">
+            <div class="controls">
+                <div class="filter-section">
+                    <span class="filter-label">Status</span>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setStatusFilter('todas')" data-filter="todas">Todas</button>
+                        <button class="filter-btn" onclick="setStatusFilter('pendente')" data-filter="pendente">Pendentes</button>
+                        <button class="filter-btn" onclick="setStatusFilter('em_andamento')" data-filter="em_andamento">Em Andamento</button>
+                        <button class="filter-btn" onclick="setStatusFilter('concluida')" data-filter="concluida">Concluídas</button>
+                        <button class="filter-btn" onclick="setStatusFilter('atrasada')" data-filter="atrasada">Atrasadas</button>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <span class="filter-label">Criticidade</span>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setCriticalityFilter('todas')" data-crit-filter="todas">Todas</button>
+                        <button class="filter-btn" onclick="setCriticalityFilter('critica')" data-crit-filter="critica">🔴 Críticas</button>
+                        <button class="filter-btn" onclick="setCriticalityFilter('urgente')" data-crit-filter="urgente">🟠 Urgentes</button>
+                        <button class="filter-btn" onclick="setCriticalityFilter('normal')" data-crit-filter="normal">🔵 Normais</button>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <span class="filter-label">Data Específica</span>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="date" id="dateFilter" class="date-filter" onchange="applyDateFilter()">
+                        <button class="filter-btn" onclick="clearDateFilter()">Limpar</button>
+                    </div>
+                </div>
+
+                <button class="add-btn" onclick="openModal()">
+                    ➕ Nova Tarefa
+                </button>
+            </div>
+
+            <div id="tasksList" class="tasks-list"></div>
+        </div>
+
+        <!-- Add Task Modal -->
+        <div id="addTaskModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-header">✨ Nova Tarefa</h3>
+                <form id="taskForm" onsubmit="addTask(event); return false;">
+                    <div class="form-group">
+                        <label>Título da Tarefa</label>
+                        <input type="text" id="taskTitle" required placeholder="Digite o título da tarefa">
+                    </div>
+
+                    <div class="form-group">
+                        <label>🎯 Nível de Criticidade</label>
+                        <select id="taskCriticality" required>
+                            <option value="critica">🔴 CRÍTICA - Máxima prioridade</option>
+                            <option value="urgente">🟠 URGENTE - Alta prioridade</option>
+                            <option value="normal" selected>🔵 NORMAL - Prioridade padrão</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Tarefa</label>
+                        <select id="taskType">
+                            <option value="diaria">Diária (10 pontos)</option>
+                            <option value="semanal">Semanal (25 pontos)</option>
+                            <option value="mensal">Mensal (50 pontos)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data de Início</label>
+                        <input type="date" id="taskDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group" onclick="toggleCheckbox('isRecurring')">
+                            <input type="checkbox" id="isRecurring" onchange="toggleRecurrence()">
+                            <label for="isRecurring" style="cursor: pointer; flex: 1; margin: 0; color: #fff;">🔁 Esta tarefa se repete?</label>
+                        </div>
+                    </div>
+
+                    <div id="recurrenceOptions" class="recurrence-options">
+                        <div class="form-group">
+                            <label>Frequência de Repetição</label>
+                            <select id="recurrenceFrequency" onchange="updateRecurrenceOptions()">
+                                <option value="daily">Todos os dias</option>
+                                <option value="weekly">Toda semana</option>
+                                <option value="monthly">Todo mês</option>
+                            </select>
+                        </div>
+
+                        <div id="weekendOption" class="form-group">
+                            <div class="checkbox-group" onclick="toggleCheckbox('excludeWeekends')">
+                                <input type="checkbox" id="excludeWeekends">
+                                <label for="excludeWeekends" style="cursor: pointer; flex: 1; margin: 0; color: #fff;">⛔ Exceto finais de semana</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Até quando? (Opcional)</label>
+                            <input type="date" id="recurrenceEndDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição (opcional)</label>
+                        <textarea id="taskDescription" rows="3" placeholder="Adicione detalhes sobre a tarefa"></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="submit-btn">🚀 Criar Tarefa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Task Without Date Modal -->
+        <div id="addTaskSemDataModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-header">📝 Nova Ação Sem Data</h3>
+                <form id="taskSemDataForm" onsubmit="addTaskSemData(event); return false;">
+                    <div class="form-group">
+                        <label>Título da Ação</label>
+                        <input type="text" id="taskTitleSemData" required placeholder="Digite o título da ação">
+                    </div>
+
+                    <div class="form-group">
+                        <label>🎯 Nível de Criticidade</label>
+                        <select id="taskCriticalitySemData" required>
+                            <option value="critica">🔴 CRÍTICA - Máxima prioridade</option>
+                            <option value="urgente">🟠 URGENTE - Alta prioridade</option>
+                            <option value="normal" selected>🔵 NORMAL - Prioridade padrão</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Tarefa</label>
+                        <select id="taskTypeSemData">
+                            <option value="diaria">Diária (10 pontos)</option>
+                            <option value="semanal">Semanal (25 pontos)</option>
+                            <option value="mensal">Mensal (50 pontos)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição (opcional)</label>
+                        <textarea id="taskDescriptionSemData" rows="3" placeholder="Adicione detalhes sobre a ação"></textarea>
+                    </div>
+
+                    <p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; padding: 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 0.5rem; margin-bottom: 1rem;">
+                        💡 Esta ação ficará na aba "Ações a Definir" até você definir uma data para ela.
+                    </p>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" onclick="closeModalSemData()">Cancelar</button>
+                        <button type="submit" class="submit-btn">📝 Criar Ação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Day Details Modal -->
+        <div id="dayModal" class="modal">
+            <div class="day-modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="modal-header" style="margin: 0;" id="dayModalTitle">Tarefas do Dia</h3>
+                    <button onclick="closeDayModal()" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; cursor: pointer; font-size: 1.25rem; font-weight: bold;">×</button>
+                </div>
+                <div id="dayTasksList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Commander 5.0 - Complete JavaScript
+        // INÍCIO DO 2025: Dezembro 2025
+
+        // Data
+        let tasks = [];
+        let taskInstances = [];
+        let tasksSemData = [];
+
+        let userStats = {
+            totalPoints: 0,
+            level: 1,
+            streak: 0,
+            completedToday: 0
+        };
+
+        let currentStatusFilter = 'todas';
+        let currentCriticalityFilter = 'todas';
+        let currentDateFilter = null;
+        let currentTimelineTypeFilter = 'todas';
+        let currentTab = 'dashboard';
+
+        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Definir data padrão como Dezembro 2025
+            const defaultDate = new Date('2025-12-01');
+            document.getElementById('taskDate').valueAsDate = defaultDate;
+            
+            updateStats();
+            renderTimeline();
+            renderCalendar();
+            renderCriticalityView();
+            renderTasks();
+            renderAcoesSemData();
+        });
+
+        function toggleCheckbox(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+            if (checkboxId === 'isRecurring') {
+                toggleRecurrence();
+            }
+        }
+
+        function generateTaskInstances() {
+            taskInstances = [];
+            
+            tasks.forEach(function(task) {
+                if (!task.isRecurring) {
+                    taskInstances.push({
+                        ...task,
+                        instanceId: task.id + '-' + task.startDate,
+                        dueDate: task.startDate,
+                        status: 'pendente'
+                    });
+                } else {
+                    const instances = generateRecurringInstances(task);
+                    taskInstances.push(...instances);
+                }
+            });
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            taskInstances.forEach(function(instance) {
+                const dueDate = new Date(instance.dueDate);
+                if (dueDate < today && instance.status === 'pendente') {
+                    instance.status = 'atrasada';
+                }
+            });
+        }
+
+        function generateRecurringInstances(task) {
+            const instances = [];
+            const startDate = new Date(task.startDate);
+            const endDate = task.endDate ? new Date(task.endDate) : new Date('2026-12-31');
+            const currentDate = new Date(startDate);
+
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay();
+                
+                if (task.excludeWeekends && (dayOfWeek === 0 || dayOfWeek === 6)) {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    continue;
+                }
+
+                const dateStr = currentDate.toISOString().split('T')[0];
+                instances.push({
+                    ...task,
+                    instanceId: task.id + '-' + dateStr,
+                    dueDate: dateStr,
+                    status: 'pendente'
+                });
+
+                if (task.frequency === 'daily') {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                } else if (task.frequency === 'weekly') {
+                    currentDate.setDate(currentDate.getDate() + 7);
+                } else if (task.frequency === 'monthly') {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+            }
+
+            return instances;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(function(el) {
+                el.classList.add('hidden');
+            });
+            document.getElementById(tab).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-button').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+
+            if (tab === 'timeline') {
+                renderTimeline();
+            } else if (tab === 'acoes-definir') {
+                renderAcoesSemData();
+            } else if (tab === 'calendario') {
+                renderCalendar();
+            } else if (tab === 'criticidade') {
+                renderCriticalityView();
+            } else if (tab === 'tarefas') {
+                renderTasks();
+            }
+        }
+
+        function updateStats() {
+            const stats = calculateStats();
+            
+            document.getElementById('totalPoints').textContent = userStats.totalPoints;
+            document.getElementById('streak').textContent = userStats.streak;
+            document.getElementById('completedToday').textContent = userStats.completedToday;
+            document.getElementById('completionRate').textContent = stats.rate;
+            
+            document.getElementById('statTotal').textContent = taskInstances.length;
+            document.getElementById('statConcluidas').textContent = stats.concluidas;
+            document.getElementById('statPendentes').textContent = stats.pendentes;
+            document.getElementById('statEmAndamento').textContent = stats.emAndamento;
+            document.getElementById('statAtrasadas').textContent = stats.atrasadas;
+            document.getElementById('statSemData').textContent = tasksSemData.length;
+            
+            document.getElementById('statCriticas').textContent = stats.criticas;
+            document.getElementById('statUrgentes').textContent = stats.urgentes;
+            document.getElementById('statNormais').textContent = stats.normais;
+        }
+
+        function calculateStats() {
+            const total = taskInstances.length;
+            const concluidas = taskInstances.filter(function(t) { return t.status === 'concluida'; }).length;
+            const pendentes = taskInstances.filter(function(t) { return t.status === 'pendente'; }).length;
+            const atrasadas = taskInstances.filter(function(t) { return t.status === 'atrasada'; }).length;
+            const emAndamento = taskInstances.filter(function(t) { return t.status === 'em_andamento'; }).length;
+            const rate = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+            
+            const criticas = taskInstances.filter(function(t) { return t.criticality === 'critica'; }).length;
+            const urgentes = taskInstances.filter(function(t) { return t.criticality === 'urgente'; }).length;
+            const normais = taskInstances.filter(function(t) { return t.criticality === 'normal'; }).length;
+            
+            return { total: total, concluidas: concluidas, pendentes: pendentes, atrasadas: atrasadas, emAndamento: emAndamento, rate: rate, criticas: criticas, urgentes: urgentes, normais: normais };
+        }
+
+        function setStatusFilter(filter) {
+            currentStatusFilter = filter;
+            document.querySelectorAll('[data-filter]').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-filter="' + filter + '"]').classList.add('active');
+            renderTasks();
+        }
+
+        function setCriticalityFilter(filter) {
+            currentCriticalityFilter = filter;
+            document.querySelectorAll('[data-crit-filter]').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-crit-filter="' + filter + '"]').classList.add('active');
+            renderTasks();
+        }
+
+        function setTimelineTypeFilter(filter) {
+            currentTimelineTypeFilter = filter;
+            document.querySelectorAll('[data-type-filter]').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-type-filter="' + filter + '"]').classList.add('active');
+            renderTimeline();
+        }
+
+        function applyDateFilter() {
+            currentDateFilter = document.getElementById('dateFilter').value;
+            renderTasks();
+        }
+
+        function clearDateFilter() {
+            currentDateFilter = null;
+            document.getElementById('dateFilter').value = '';
+            renderTasks();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            
+            let filteredInstances = taskInstances;
+            if (currentTimelineTypeFilter !== 'todas') {
+                filteredInstances = taskInstances.filter(function(t) { return t.type === currentTimelineTypeFilter; });
+            }
+            
+            if (filteredInstances.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p style="color: #c084fc; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Nenhuma tarefa ' + (currentTimelineTypeFilter !== 'todas' ? currentTimelineTypeFilter : '') + ' cadastrada</p><p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Clique em "Nova Tarefa" para começar!</p></div>';
+                return;
+            }
+
+            const tasksByMonth = {};
+            filteredInstances.forEach(function(task) {
+                const date = new Date(task.dueDate);
+                const monthKey = date.getFullYear() + '-' + date.getMonth();
+                
+                if (!tasksByMonth[monthKey]) {
+                    tasksByMonth[monthKey] = [];
+                }
+                tasksByMonth[monthKey].push(task);
+            });
+
+            let html = '';
+            
+            // Dezembro 2025
+            const dec2025Key = '2025-11';
+            const tasksInDec2025 = tasksByMonth[dec2025Key] || [];
+            const completedDec2025 = tasksInDec2025.filter(function(t) { return t.status === 'concluida'; }).length;
+            
+            html += '<div class="month-section"><div class="month-header" onclick="toggleMonth(\'dec2025\')"><div class="month-title"><span>Dezembro 2025</span></div><div class="month-stats"><span class="month-badge total">' + tasksInDec2025.length + ' tarefas</span><span class="month-badge completed">✓ ' + completedDec2025 + '</span><span class="expand-icon" id="expand-dec2025">▼</span></div></div><div class="month-content" id="month-dec2025">' + renderMonthTasks(tasksInDec2025) + '</div></div>';
+            
+            // 2026
+            for (let i = 0; i < 12; i++) {
+                const monthKey = '2026-' + i;
+                const tasksInMonth = tasksByMonth[monthKey] || [];
+                const completedCount = tasksInMonth.filter(function(t) { return t.status === 'concluida'; }).length;
+                
+                html += '<div class="month-section"><div class="month-header" onclick="toggleMonth(' + i + ')"><div class="month-title"><span>' + months[i] + ' 2026</span></div><div class="month-stats"><span class="month-badge total">' + tasksInMonth.length + ' tarefas</span><span class="month-badge completed">✓ ' + completedCount + '</span><span class="expand-icon" id="expand-' + i + '">▼</span></div></div><div class="month-content" id="month-' + i + '">' + renderMonthTasks(tasksInMonth) + '</div></div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function toggleMonth(monthIndex) {
+            const content = document.getElementById('month-' + monthIndex);
+            const icon = document.getElementById('expand-' + monthIndex);
+            
+            content.classList.toggle('expanded');
+            icon.classList.toggle('rotated');
+        }
+
+        function renderMonthTasks(tasks) {
+            if (tasks.length === 0) {
+                return '<div class="empty-state"><div class="empty-icon">📅</div><p style="color: #c084fc; font-size: 1rem; font-weight: 600;">Nenhuma tarefa neste mês</p></div>';
+            }
+
+            tasks.sort(function(a, b) {
+                const criticalityOrder = { critica: 0, urgente: 1, normal: 2 };
+                if (criticalityOrder[a.criticality] !== criticalityOrder[b.criticality]) {
+                    return criticalityOrder[a.criticality] - criticalityOrder[b.criticality];
+                }
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+
+            return '<div class="tasks-list">' + tasks.map(function(task) { return renderTaskCard(task); }).join('') + '</div>';
+        }
+
+        function renderCalendar() {
+            const monthSelect = document.getElementById('monthSelect');
+            const selected = monthSelect.value.split('-');
+            const selectedMonth = parseInt(selected[0]);
+            const year = parseInt(selected[1]);
+            
+            const firstDay = new Date(year, selectedMonth, 1);
+            const lastDay = new Date(year, selectedMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            const container = document.getElementById('calendarDays');
+            let html = '';
+            
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = year + '-' + String(selectedMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                const tasksForDay = taskInstances.filter(function(task) { return task.dueDate === dateStr; });
+                const dayOfWeek = new Date(dateStr).getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                html += '<div class="calendar-day ' + (tasksForDay.length > 0 ? 'has-tasks' : '') + ' ' + (isWeekend ? 'weekend' : '') + '" onclick="showDayTasks(\'' + dateStr + '\')">';
+                html += tasksForDay.length > 0 ? '<span class="task-count-badge">' + tasksForDay.length + '</span>' : '';
+                html += '<div class="calendar-day-number">' + day + '</div>';
+                if (tasksForDay.length > 0) {
+                    html += '<div class="calendar-dots">';
+                    tasksForDay.slice(0, 4).forEach(function(task) {
+                        const color = task.status === 'concluida' ? '#34d399' : task.status === 'atrasada' ? '#fb7185' : task.status === 'em_andamento' ? '#60a5fa' : '#fbbf24';
+                        html += '<div class="calendar-dot" style="background: ' + color + ';"></div>';
+                    });
+                    html += '</div>';
+                }
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function showDayTasks(dateStr) {
+            const tasksForDay = taskInstances.filter(function(task) { return task.dueDate === dateStr; });
+            
+            if (tasksForDay.length === 0) {
+                return;
+            }
+
+            const date = new Date(dateStr);
+            const dayOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][date.getDay()];
+            
+            document.getElementById('dayModalTitle').textContent = '📅 ' + dayOfWeek + ', ' + formatDate(dateStr) + ' (' + tasksForDay.length + ' ' + (tasksForDay.length === 1 ? 'tarefa' : 'tarefas') + ')';
+            
+            const container = document.getElementById('dayTasksList');
+            container.innerHTML = tasksForDay.map(function(task) {
+                const parentTask = tasks.find(function(t) { return t.id === task.id; });
+                const criticalityIcons = { critica: '🔴', urgente: '🟠', normal: '🔵' };
+                
+                return '<div class="day-task-item"><div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;"><div style="flex: 1;"><h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; color: #fff;">' + task.title + (parentTask && parentTask.isRecurring ? '<span class="recurring-badge" style="font-size: 0.625rem;">🔁</span>' : '') + '</h4><div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><span class="badge ' + task.status + '" style="font-size: 0.625rem;">' + getStatusLabel(task.status) + '</span><span style="font-size: 0.75rem; color: rgba(192, 132, 252, 0.7);">' + criticalityIcons[task.criticality] + ' ' + task.criticality.toUpperCase() + '</span><span style="color: rgba(192, 132, 252, 0.7); font-size: 0.75rem;">⭐ ' + task.points + 'pts</span></div></div></div>' + (task.description ? '<p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; margin-bottom: 0.75rem;">' + task.description + '</p>' : '') + '<div style="display: flex; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1);"><select onchange="updateTaskStatus(\'' + task.instanceId + '\', this.value)" style="flex: 1; padding: 0.5rem; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 0.875rem; font-weight: 500;"><option value="pendente" ' + (task.status === 'pendente' ? 'selected' : '') + '>Pendente</option><option value="em_andamento" ' + (task.status === 'em_andamento' ? 'selected' : '') + '>Em Andamento</option><option value="concluida" ' + (task.status === 'concluida' ? 'selected' : '') + '>Concluída</option><option value="atrasada" ' + (task.status === 'atrasada' ? 'selected' : '') + '>Atrasada</option></select></div></div>';
+            }).join('');
+            
+            document.getElementById('dayModal').classList.add('show');
+        }
+
+        function closeDayModal() {
+            document.getElementById('dayModal').classList.remove('show');
+        }
+
+        function renderCriticalityView() {
+            const critical = taskInstances.filter(function(t) { return t.criticality === 'critica'; });
+            const urgent = taskInstances.filter(function(t) { return t.criticality === 'urgente'; });
+            const normal = taskInstances.filter(function(t) { return t.criticality === 'normal'; });
+
+            document.getElementById('criticalCount').textContent = critical.length;
+            document.getElementById('urgentCount').textContent = urgent.length;
+            document.getElementById('normalCount').textContent = normal.length;
+
+            document.getElementById('criticalTasks').innerHTML = critical.length > 0 
+                ? critical.map(function(task) { return renderTaskCard(task); }).join('')
+                : '<div class="empty-state"><div class="empty-icon">🎯</div><p style="color: #c084fc;">Nenhuma tarefa crítica</p></div>';
+
+            document.getElementById('urgentTasks').innerHTML = urgent.length > 0
+                ? urgent.map(function(task) { return renderTaskCard(task); }).join('')
+                : '<div class="empty-state"><div class="empty-icon">⚡</div><p style="color: #c084fc;">Nenhuma tarefa urgente</p></div>';
+
+            document.getElementById('normalTasks').innerHTML = normal.length > 0
+                ? normal.map(function(task) { return renderTaskCard(task); }).join('')
+                : '<div class="empty-state"><div class="empty-icon">📋</div><p style="color: #c084fc;">Nenhuma tarefa normal</p></div>';
+        }
+
+        function renderTasks() {
+            const filtered = taskInstances.filter(function(task) {
+                const matchesStatus = currentStatusFilter === 'todas' || task.status === currentStatusFilter;
+                const matchesCriticality = currentCriticalityFilter === 'todas' || task.criticality === currentCriticalityFilter;
+                const matchesDate = !currentDateFilter || task.dueDate === currentDateFilter;
+                return matchesStatus && matchesCriticality && matchesDate;
+            });
+
+            filtered.sort(function(a, b) {
+                const criticalityOrder = { critica: 0, urgente: 1, normal: 2 };
+                if (criticalityOrder[a.criticality] !== criticalityOrder[b.criticality]) {
+                    return criticalityOrder[a.criticality] - criticalityOrder[b.criticality];
+                }
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+
+            const container = document.getElementById('tasksList');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p style="color: #c084fc; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Nenhuma tarefa encontrada</p><p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Ajuste os filtros ou adicione uma nova tarefa!</p></div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(function(task) { return renderTaskCard(task); }).join('');
+        }
+
+        function renderAcoesSemData() {
+            const container = document.getElementById('acoesSemDataList');
+            
+            if (tasksSemData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p style="color: #c084fc; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Nenhuma ação sem data</p><p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem;">Estas são tarefas que você ainda não definiu quando fazer!</p></div>';
+                return;
+            }
+
+            tasksSemData.sort(function(a, b) {
+                const criticalityOrder = { critica: 0, urgente: 1, normal: 2 };
+                return criticalityOrder[a.criticality] - criticalityOrder[b.criticality];
+            });
+
+            container.innerHTML = tasksSemData.map(function(task) { return renderTaskSemDataCard(task); }).join('');
+        }
+
+        function renderTaskSemDataCard(task) {
+            const criticalityIcons = { critica: '🔴', urgente: '🟠', normal: '🔵' };
+            const criticalityLabels = { critica: 'CRÍTICA', urgente: 'URGENTE', normal: 'NORMAL' };
+
+            return '<div class="task-card sem-data"><div class="task-header"><div class="task-info"><div class="task-title"><span>' + task.title + '</span><span class="criticality-badge ' + task.criticality + '">' + criticalityIcons[task.criticality] + ' ' + criticalityLabels[task.criticality] + '</span></div><div class="task-meta"><span class="badge sem_data">📝 A Definir</span><span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.3);">' + task.type + '</span><span>⭐ ' + task.points + 'pts</span></div>' + (task.description ? '<p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; margin-top: 0.5rem;">' + task.description + '</p>' : '') + '</div></div><div class="task-actions"><input type="date" id="date-' + task.id + '" placeholder="Definir data" style="flex: 1;"><button class="define-date-btn" onclick="definirData(\'' + task.id + '\')">✓ Definir Data</button><button class="delete-btn" onclick="deletarAcaoSemData(\'' + task.id + '\')">🗑️ Excluir</button></div></div>';
+        }
+
+        function renderTaskCard(task) {
+            const parentTask = tasks.find(function(t) { return t.id === task.id; });
+            const criticalityIcons = { critica: '🔴', urgente: '🟠', normal: '🔵' };
+            const criticalityLabels = { critica: 'CRÍTICA', urgente: 'URGENTE', normal: 'NORMAL' };
+
+            return '<div class="task-card ' + task.criticality + '"><div class="task-header"><div class="task-info"><div class="task-title"><span>' + task.title + '</span><span class="criticality-badge ' + task.criticality + '">' + criticalityIcons[task.criticality] + ' ' + criticalityLabels[task.criticality] + '</span></div><div class="task-meta"><span class="badge ' + task.status + '">' + getStatusLabel(task.status) + '</span><span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.3);">' + task.type + '</span>' + (parentTask && parentTask.isRecurring ? '<span class="recurring-badge">🔁 Recorrente</span>' : '') + '<span>📅 ' + formatDate(task.dueDate) + '</span><span>⭐ ' + task.points + 'pts</span></div>' + (task.description ? '<p style="color: rgba(192, 132, 252, 0.7); font-size: 0.875rem; margin-top: 0.5rem;">' + task.description + '</p>' : '') + '</div></div><div class="task-actions"><select onchange="updateTaskStatus(\'' + task.instanceId + '\', this.value)"><option value="pendente" ' + (task.status === 'pendente' ? 'selected' : '') + '>⏰ Pendente</option><option value="em_andamento" ' + (task.status === 'em_andamento' ? 'selected' : '') + '>⚡ Em Andamento</option><option value="concluida" ' + (task.status === 'concluida' ? 'selected' : '') + '>✓ Concluída</option><option value="atrasada" ' + (task.status === 'atrasada' ? 'selected' : '') + '>✗ Atrasada</option></select><button class="delete-btn" onclick="deleteTask(\'' + task.instanceId + '\')">🗑️ Excluir</button></div></div>';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                pendente: '⏰ Pendente',
+                em_andamento: '⚡ Em Andamento',
+                concluida: '✓ Concluída',
+                atrasada: '✗ Atrasada'
+            };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function updateTaskStatus(instanceId, newStatus) {
+            const instance = taskInstances.find(function(t) { return t.instanceId === instanceId; });
+            if (!instance) return;
+
+            const oldStatus = instance.status;
+            instance.status = newStatus;
+
+            if (newStatus === 'concluida' && oldStatus !== 'concluida') {
+                userStats.totalPoints += instance.points;
+                userStats.completedToday++;
+            } else if (oldStatus === 'concluida' && newStatus !== 'concluida') {
+                userStats.totalPoints -= instance.points;
+                userStats.completedToday = Math.max(0, userStats.completedToday - 1);
+            }
+
+            userStats.level = Math.floor(userStats.totalPoints / 100);
+
+            updateStats();
+            
+            if (currentTab === 'timeline') renderTimeline();
+            else if (currentTab === 'calendario') renderCalendar();
+            else if (currentTab === 'criticidade') renderCriticalityView();
+            else if (currentTab === 'tarefas') renderTasks();
+        }
+
+        function deleteTask(instanceId) {
+            if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return;
+            
+            const instance = taskInstances.find(function(t) { return t.instanceId === instanceId; });
+            if (instance && instance.status === 'concluida') {
+                userStats.totalPoints -= instance.points;
+                userStats.completedToday = Math.max(0, userStats.completedToday - 1);
+                userStats.level = Math.floor(userStats.totalPoints / 100);
+            }
+
+            taskInstances = taskInstances.filter(function(t) { return t.instanceId !== instanceId; });
+            updateStats();
+            
+            if (currentTab === 'timeline') renderTimeline();
+            else if (currentTab === 'calendario') renderCalendar();
+            else if (currentTab === 'criticidade') renderCriticalityView();
+            else if (currentTab === 'tarefas') renderTasks();
+        }
+
+        function definirData(taskId) {
+            const dateInput = document.getElementById('date-' + taskId);
+            const selectedDate = dateInput.value;
+            
+            if (!selectedDate) {
+                alert('Por favor, selecione uma data!');
+                return;
+            }
+
+            const taskSemData = tasksSemData.find(function(t) { return t.id == taskId; });
+            if (!taskSemData) return;
+
+            const newTask = {
+                id: Date.now(),
+                title: taskSemData.title,
+                criticality: taskSemData.criticality,
+                type: taskSemData.type,
+                description: taskSemData.description,
+                points: taskSemData.points,
+                startDate: selectedDate,
+                isRecurring: false
+            };
+
+            tasks.push(newTask);
+            tasksSemData = tasksSemData.filter(function(t) { return t.id != taskId; });
+            
+            generateTaskInstances();
+            updateStats();
+            renderAcoesSemData();
+            
+            alert('✅ Data definida! Tarefa "' + newTask.title + '" agendada para ' + formatDate(selectedDate));
+        }
+
+        function deletarAcaoSemData(taskId) {
+            if (!confirm('Tem certeza que deseja excluir esta ação?')) return;
+            
+            tasksSemData = tasksSemData.filter(function(t) { return t.id != taskId; });
+            updateStats();
+            renderAcoesSemData();
+        }
+
+        function openModal() {
+            document.getElementById('addTaskModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('addTaskModal').classList.remove('show');
+            document.getElementById('taskForm').reset();
+            document.getElementById('recurrenceOptions').classList.remove('show');
+        }
+
+        function openModalSemData() {
+            document.getElementById('addTaskSemDataModal').classList.add('show');
+        }
+
+        function closeModalSemData() {
+            document.getElementById('addTaskSemDataModal').classList.remove('show');
+            document.getElementById('taskSemDataForm').reset();
+        }
+
+        function toggleRecurrence() {
+            const isRecurring = document.getElementById('isRecurring').checked;
+            const options = document.getElementById('recurrenceOptions');
+            
+            if (isRecurring) {
+                options.classList.add('show');
+                updateRecurrenceOptions();
+            } else {
+                options.classList.remove('show');
+            }
+        }
+
+        function updateRecurrenceOptions() {
+            const frequency = document.getElementById('recurrenceFrequency').value;
+            const weekendOption = document.getElementById('weekendOption');
+            
+            if (frequency === 'daily') {
+                weekendOption.style.display = 'block';
+            } else {
+                weekendOption.style.display = 'none';
+            }
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('taskTitle').value;
+            const criticality = document.getElementById('taskCriticality').value;
+            const type = document.getElementById('taskType').value;
+            const startDate = document.getElementById('taskDate').value;
+            const description = document.getElementById('taskDescription').value;
+            const isRecurring = document.getElementById('isRecurring').checked;
+            
+            const points = type === 'diaria' ? 10 : type === 'semanal' ? 25 : 50;
+            
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                criticality: criticality,
+                type: type,
+                startDate: startDate,
+                description: description,
+                points: points,
+                isRecurring: isRecurring
+            };
+
+            if (isRecurring) {
+                newTask.frequency = document.getElementById('recurrenceFrequency').value;
+                newTask.excludeWeekends = document.getElementById('excludeWeekends').checked;
+                const endDate = document.getElementById('recurrenceEndDate').value;
+                newTask.endDate = endDate || '2026-12-31';
+            }
+            
+            tasks.push(newTask);
+            generateTaskInstances();
+            updateStats();
+            
+            if (currentTab === 'timeline') renderTimeline();
+            else if (currentTab === 'calendario') renderCalendar();
+            else if (currentTab === 'criticidade') renderCriticalityView();
+            else if (currentTab === 'tarefas') renderTasks();
+            
+            closeModal();
+            alert('✅ Tarefa "' + title + '" criada com sucesso!' + (isRecurring ? ' 🔁 Repetições geradas!' : ''));
+        }
+
+        function addTaskSemData(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('taskTitleSemData').value;
+            const criticality = document.getElementById('taskCriticalitySemData').value;
+            const type = document.getElementById('taskTypeSemData').value;
+            const description = document.getElementById('taskDescriptionSemData').value;
+            
+            const points = type === 'diaria' ? 10 : type === 'semanal' ? 25 : 50;
+            
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                criticality: criticality,
+                type: type,
+                description: description,
+                points: points
+            };
+            
+            tasksSemData.push(newTask);
+            updateStats();
+            renderAcoesSemData();
+            
+            closeModalSemData();
+            alert('📝 Ação "' + title + '" criada com sucesso! Defina a data quando estiver pronto.');
+        }
+
+        document.getElementById('addTaskModal').addEventListener('click', function(e) {
+            if (e.target.id === 'addTaskModal') {
+                closeModal();
+            }
+        });
+
+        document.getElementById('addTaskSemDataModal').addEventListener('click', function(e) {
+            if (e.target.id === 'addTaskSemDataModal') {
+                closeModalSemData();
+            }
+        });
+
+        document.getElementById('dayModal').addEventListener('click', function(e) {
+            if (e.target.id === 'dayModal') {
+                closeDayModal();
+            }
+        });
+    </script>
+</body>
+</html>
